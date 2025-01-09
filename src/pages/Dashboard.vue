@@ -38,8 +38,11 @@ const containerClass = computed(() => {
 });
 const isReady=ref(false);
 onMounted(async () => {
+  console.log('before fertching glossary')
   await store.fetchGlossaryItems();
+  console.log('fertching glossary')
   nextTick(() => {
+    console.log('inside nexttick glossary')
     isReady.value = true; // Only render child components after glossaryItems are fetched
   });
 });

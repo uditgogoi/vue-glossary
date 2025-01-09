@@ -2,7 +2,7 @@
   <div>
     <div class="grid grid-cols-10 gap-4 p-4">
       <div class="col-span-10 md:col-span-8 mb-8">
-        <InputText v-model="title" class="w-full" placeholder="Title" />
+        <InputText v-model="title" class="w-full" placeholder="Title" @update:modelValue="onValueChange"/>
       </div>
       <!-- Editor -->
       <div class="col-span-10 md:col-span-8">
@@ -97,4 +97,8 @@ const onSubmitDocument = () => {
   const newDoc= createDocument({title:title.value,content:editorContent.value});
   store.addDocumentToGlossary(newDoc,selectedGlossary.value.code)
 };
+
+const onValueChange=(e)=> {
+  console.log(e)
+}
 </script>

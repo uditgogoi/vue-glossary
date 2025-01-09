@@ -68,7 +68,20 @@
             <div class="flex flex-col gap-4">
               <div>
                 <ul class="list-none p-0 m-0 flex flex-col">
-                  <li
+                  <li 
+                  @click="logout"
+                   class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border"
+                  >
+                    <div>
+                      <Avatar
+                        icon="pi pi-power-off"
+                        style="background-color: #dee9fc; color: #1a2551"
+                        shape="circle"
+                      />
+                      <span class="font-medium pl-3">Logout</span>
+                    </div>
+                  </li>
+                  <!-- <li
                     v-for="member in members"
                     :key="member.name"
                     class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border"
@@ -88,7 +101,7 @@
                         {{ member.email }}
                       </div>
                     </div>
-                  </li>
+                  </li> -->
                 </ul>
               </div>
             </div>
@@ -105,11 +118,15 @@ import { useLayout } from "@/composables/layout";
 const { onMenuToggle } = useLayout();
 import Popover from "primevue/popover";
 import Avatar from "primevue/avatar";
-import router from "@/router";
 import { useGlossaryStore } from "@/store/";
+import { user } from "@/store/user";
+import { useRouter } from "vue-router";
 
 const store = useGlossaryStore();
-const showBackButton = computed(()=> store.getCurrentPage === 'home'?false:true)
+const router= useRouter();
+const showBackButton = computed(() =>
+  store.getCurrentPage === "home" ? false : true
+);
 const op = ref();
 const members = ref([
   {
@@ -135,6 +152,12 @@ const members = ref([
 const toggle = (event) => {
   op.value.toggle(event);
 };
+
+const logout=async()=> {
+  await user.logout();
+  router.push('/login')
+
+}
 </script>
 <style scoped>
 </style>

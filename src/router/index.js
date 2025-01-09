@@ -3,7 +3,7 @@ import {
   createRouter,
   createWebHistory,
 } from "vue-router";
-
+import {user} from "@/store/user";
 import Login from "@/pages/auth/Login.vue";
 import Dashboard from "@/pages/Dashboard.vue";
 import Glossary from "@/pages/Glossary.vue";
@@ -37,6 +37,7 @@ const routes = [
         name:'createDocument'
       },
     ],
+    meta: { requiresAuth: true }
   },
 ];
 
@@ -49,5 +50,17 @@ router.afterEach((to) => {
   const store = useGlossaryStore();
   store.setCurrentPage(to.name || to.path);
 });
+
+router.beforeEach((to,from,next)=> {
+  const loggedInUser= user.currentUser;
+  if(to.name==='Login' && loggedInUser) {
+    next({name:'Dashboard'})
+  }
+  if(to.matched.some(record=> record.meta.requiresAuth) && !loggedInUser) {
+    next({name:'Login'})
+  } else{
+    next();
+  }
+})
 
 export default router;

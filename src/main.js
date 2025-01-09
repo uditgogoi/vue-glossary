@@ -6,13 +6,13 @@ import router from "./router";
 import { createPinia } from "pinia";
 import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
-import Tooltip from 'primevue/tooltip';
+import Tooltip from "primevue/tooltip";
+import { user } from "@/store/user";
 
 import "./style.css";
 import { definePreset } from "@primevue/themes";
-import 'primeicons/primeicons.css'
+import "primeicons/primeicons.css";
 // import ConfirmationService from 'primevue/confirmationservice';
-
 
 const customPreset = definePreset(Aura, {
   semantic: {
@@ -32,21 +32,26 @@ const customPreset = definePreset(Aura, {
   },
 });
 
-const pinia = createPinia();
-createApp(App)
-  .use(PrimeVue, {
-    theme: {
-      preset: customPreset,
-      options: {
-        prefix: "p",
-        darkModeSelector: "system",
-        cssLayer: false,
+async function initialiseApp() {
+  await user.init();
+  const pinia = createPinia();
+  createApp(App)
+    .use(PrimeVue, {
+      theme: {
+        preset: customPreset,
+        options: {
+          prefix: "p",
+          darkModeSelector: "system",
+          cssLayer: false,
+        },
       },
-    },
-  })
-  .use(router)
-  .use(pinia)
-  .use(ConfirmationService)
-  .use(ToastService)
-  .directive('tooltip', Tooltip)
-  .mount("#app");
+    })
+    .use(pinia)
+    .use(router)
+    .use(ConfirmationService)
+    .use(ToastService)
+    .directive("tooltip", Tooltip)
+    .mount("#app");
+}
+
+initialiseApp();
