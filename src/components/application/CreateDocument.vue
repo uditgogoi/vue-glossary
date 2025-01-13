@@ -2,7 +2,12 @@
   <div>
     <div class="grid grid-cols-10 gap-4 p-4">
       <div class="col-span-10 md:col-span-8 mb-8">
-        <InputText v-model="title" class="w-full" placeholder="Title" @update:modelValue="onValueChange"/>
+        <InputText
+          v-model="title"
+          class="w-full"
+          placeholder="Title"
+          @update:modelValue="onValueChange"
+        />
       </div>
       <!-- Editor -->
       <div class="col-span-10 md:col-span-8">
@@ -58,7 +63,6 @@ import {
   createGlossaryItem,
   createDocument,
 } from "@/composables/GlossaryDataModel";
-import {fetchText} from '@/service/services';
 const props = defineProps(["documentContent"]);
 const title = ref("");
 const editorContent = ref("");
@@ -77,9 +81,11 @@ const showCreateGlossaryModal = ref(false);
 watch(
   () => props.documentContent,
   () => {
-    title.value = props.documentContent.title;
-    selectedGlossary.value = props.documentContent.selectedGlossary;
-    editorContent.value= props.documentContent.content
+    if (props.documentContent && Object.keys(props.documentContent).length > 0) {
+      title.value = props.documentContent.title;
+      selectedGlossary.value = props.documentContent.selectedGlossary;
+      editorContent.value = props.documentContent.content;
+    }
   },
   { immediate: true },
   { deep: true } // Ensures it listens to nested changes
@@ -124,12 +130,11 @@ const onSubmitDocument = () => {
   });
   store.addDocumentToGlossary(newDoc, selectedGlossary.value.code);
 };
-const onValueChange=async(e)=> {
+const onValueChange = async (e) => {
   // try {
   //   const generatedtext= fetchText(e);
   //   console.log(generatedtext)
   // } catch(e){
-
   // }
-}
+};
 </script>

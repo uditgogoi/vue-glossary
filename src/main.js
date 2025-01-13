@@ -7,7 +7,7 @@ import { createPinia } from "pinia";
 import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
 import Tooltip from "primevue/tooltip";
-import { user } from "@/store/user";
+// import { user } from "@/store/user";
 
 import "./style.css";
 import { definePreset } from "@primevue/themes";
@@ -33,7 +33,7 @@ const customPreset = definePreset(Aura, {
 });
 
 async function initialiseApp() {
-  await user.init();
+  // await user.init();
   const pinia = createPinia();
   createApp(App)
     .use(PrimeVue, {

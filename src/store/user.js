@@ -1,40 +1,45 @@
-import {ID} from "appwrite";
-import {account} from "@/db";
-import { reactive } from "vue";
-
-export const user= reactive({
-    currentUser:null,
-    async init() {
-        try {
-            this.currentUser= await account.get();
-        } catch(e) {
-            this.currentUser=null;
-        } finally {
-            return true
-        }
+import { defineStore } from "pinia";
+import { authServices } from "@/service/authServices";
+export const useAuthStore = defineStore("auth", {
+  state: () => ({
+    currentUser: null,
+  }),
+  getters: {
+    loggedInUser: (state)=> state.currentUser || null,
+  },
+  actions: {
+    async getLoggedInUser() {
+      try {
+        console.log("running init")
+        this.currentUser = await authServices.getCurrentUser();
+        
+      } catch (e) {
+        this.currentUser = null;
+      }
     },
 
-    async register(email,password,name) {
-        try {
-            const account= await account.create(ID.unique(),email,password,name);
-            return account;
-        } catch(e) {
-            return new Error('Account creation failed')
-        }  
+    async register(email, password, name) {
+      try {
+        const account = await authServices.register(email, password, name);
+        return account;
+        // return the account currently. check the logic later since the flow after register is not completed.
+      } catch (e) {
+        return new Error("Account creation failed");
+      }
     },
-
-    async login(email,password) {
-        try {
-            const loggedInUser= await account.createEmailPasswordSession(email,password);
-            this.currentUser=loggedInUser;
-            return loggedInUser;
-        } catch(e) {
-            return new Error('Login Error')
-        }
+    async login(email, password) {
+      try {
+        const loggedInUser = await authServices.login(email, password);
+        this.currentUser = loggedInUser;
+        return loggedInUser;
+      } catch (e) {
+        return new Error("Login Error");
+      }
     },
 
     async logout() {
-        await account.deleteSession("current");
-        this.currentUser=null;
-    }
- })
+      await authServices.logout();
+      this.currentUser = null;
+    },
+  },
+});

@@ -119,10 +119,11 @@ const { onMenuToggle } = useLayout();
 import Popover from "primevue/popover";
 import Avatar from "primevue/avatar";
 import { useGlossaryStore } from "@/store/";
-import { user } from "@/store/user";
+import { useAuthStore } from "@/store/user";
 import { useRouter } from "vue-router";
 
 const store = useGlossaryStore();
+const user= useAuthStore();
 const router= useRouter();
 const showBackButton = computed(() =>
   store.getCurrentPage === "home" ? false : true

@@ -4,7 +4,7 @@
     <app-sidebar></app-sidebar>
     <div class="layout-main-container">
       <div class="layout-main">
-        <router-view></router-view>
+        <router-view v-if="loggedInUser"></router-view>
       </div>
       <app-footer></app-footer>
     </div>
@@ -14,6 +14,7 @@
 </template>
 <script setup>
 import { useGlossaryStore } from "@/store";
+import { useAuthStore } from "@/store/user";
 // import Button from "primevue/button";
 // import Dialog from "primevue/dialog";
 import AppTopbar from "@/components/AppTopbar.vue";
@@ -24,7 +25,7 @@ import { useLayout } from "@/composables/layout";
 const { layoutConfig, layoutState } = useLayout();
 
 const store = useGlossaryStore();
-
+const user= useAuthStore();
 const containerClass = computed(() => {
   return {
     "layout-overlay": layoutConfig.menuMode === "overlay",
@@ -38,12 +39,13 @@ const containerClass = computed(() => {
 });
 const isReady=ref(false);
 onMounted(async () => {
-  console.log('before fertching glossary')
   await store.fetchGlossaryItems();
-  console.log('fertching glossary')
   nextTick(() => {
     console.log('inside nexttick glossary')
     isReady.value = true; // Only render child components after glossaryItems are fetched
   });
 });
+
+const loggedInUser= computed(()=> user.currentUser)
+
 </script>

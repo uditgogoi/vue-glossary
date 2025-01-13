@@ -3,41 +3,46 @@ import {
   createRouter,
   createWebHistory,
 } from "vue-router";
-import {user} from "@/store/user";
+import { useAuthStore } from "@/store/user";
 import Login from "@/pages/auth/Login.vue";
 import Dashboard from "@/pages/Dashboard.vue";
 import Glossary from "@/pages/Glossary.vue";
-import Document from "@/pages/Document.vue";
+import Document from "@/pages/NewDocument.vue";
 import Home from "@/pages/Home.vue";
-import {useGlossaryStore} from "@/store";
+import { useGlossaryStore } from "@/store";
+
 const routes = [
   {
     path: "/login",
     component: Login,
-    name:'Login'
+    name: "Login",
   },
   {
     path: "",
     component: Dashboard,
-    name:'Dashboard',
+    name: "Dashboard",
+    meta: { requiresAuth: true },
     children: [
       {
-        path:'',
+        path: "",
         component: Home,
-        name:'Home'
+        name: "Home",
       },
       {
         path: "glossary/:id",
         component: Glossary,
-        name:'Glossary'
+        name: "Glossary",
       },
       {
         path: "document/create",
         component: Document,
-        name:'createDocument'
+        name: "createDocument",
       },
     ],
-    meta: { requiresAuth: true }
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/login",
   },
 ];
 
@@ -51,16 +56,23 @@ router.afterEach((to) => {
   store.setCurrentPage(to.name || to.path);
 });
 
-router.beforeEach((to,from,next)=> {
-  const loggedInUser= user.currentUser;
-  if(to.name==='Login' && loggedInUser) {
-    next({name:'Dashboard'})
+router.beforeEach(async (to, from, next) => {
+  const user = useAuthStore();
+  if (user.currentUser === null) {
+    await user.getLoggedInUser();
   }
-  if(to.matched.some(record=> record.meta.requiresAuth) && !loggedInUser) {
-    next({name:'Login'})
-  } else{
+  const loggedInUser = user.currentUser;
+  if (to.name === "Login" && loggedInUser) {
+    next({ name: "Dashboard" });
+  }
+  
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+
+  if (requiresAuth && !loggedInUser) {
+    next({ name: "Login" });
+  } else {
     next();
   }
-})
+});
 
 export default router;

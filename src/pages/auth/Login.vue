@@ -1,6 +1,5 @@
 <template>
   <div class="flex h-screen items-center justify-center bg-gray-100">
-    {{ loggedInUser ? `Logged in as ${loggedInUser.name}` : "Not logged in" }}
     <div class="w-full max-w-md p-6 bg-white rounded shadow-lg">
       <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
       <form @submit.prevent="handleLogin">
@@ -56,17 +55,14 @@
           label="Register"
           @click="register"
           variant="text"
-          severity="secondary"
           class="w-full text-white mt-5"
         />
-
-        <Button
-          label="Log Out"
+        <!-- <Button
+          label="Logout"
           @click="logout"
           variant="text"
-          severity="warning"
           class="w-full text-white mt-5"
-        />
+        /> -->
       </form>
     </div>
   </div>
@@ -76,16 +72,16 @@ import { ref } from "vue";
 import InputText from "primevue/inputtext";
 import Password from "primevue/password";
 import Button from "primevue/button";
-import { account, ID } from "@/db";
+// import { account, ID } from "@/db";
 import { useRouter } from "vue-router";
-import { user } from "@/store/user";
+import { useAuthStore } from "@/store/user";
 
 const loggedInUser = ref(null);
 const email = ref("");
 const password = ref("");
 const name = ref("");
 const router= useRouter();
-
+const user= useAuthStore();
 const login = async (email, password) => {
   try {
     const loggedInUser= await user.login(email,password);
@@ -96,6 +92,9 @@ const login = async (email, password) => {
     console.log(e)
   }
 };
+// const logout=async()=> {
+//   await user.logout()
+// }
 </script>
 
 <style scoped>
