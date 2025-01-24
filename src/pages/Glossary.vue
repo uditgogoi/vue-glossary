@@ -61,7 +61,7 @@
             />
           </div>
           <div class="mt-4">
-            <Button label="Save Changes" severity="primary" size="small"/>
+            <Button label="Save Changes" severity="primary" size="small" @click="onSaveChanges"/>
           </div>
         </div>
       </div>
@@ -140,6 +140,10 @@ const getDocumentById = () => {
   // console.log(document)
   return currentDocument.title;
 };
+
+const onSaveChanges=()=> {
+  
+}
 </script>
 <style scoped>
 </style>

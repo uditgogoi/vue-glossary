@@ -126,7 +126,7 @@ const store = useGlossaryStore();
 const user= useAuthStore();
 const router= useRouter();
 const showBackButton = computed(() =>
-  store.getCurrentPage === "home" ? false : true
+  store.getCurrentPage.toLowerCase() === "home" ? false : true
 );
 const op = ref();
 const members = ref([

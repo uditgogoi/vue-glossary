@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { data } from "@/composables/data";
-
+import ApiServices from "@/service/services";
 export const useGlossaryStore = defineStore("glossary", {
   state: () => ({
     glossaryData: [],
@@ -30,11 +30,27 @@ export const useGlossaryStore = defineStore("glossary", {
     setCurrentPage(page) {
       this.currentPage = page;
     },
-    fetchGlossaryItems() {
-      this.glossaryData = data ? data : null;
+    async fetchGlossaryItems() {
+      try {
+        this.glossaryData= await ApiServices.getAllGlossary();
+        console.log(this.glossaryData)
+      } catch(e){
+        this.glossaryData= this.glossaryData || [];
+      } finally {
+        this.glossaryData= this.glossaryData || [];
+      }
+      // this.glossaryData = data ? data : null;
     },
-    addNewGlossaryItem(item) {
-      this.glossaryData = [item, ...this.glossaryData];
+    async addNewGlossary(item) {
+      // this.glossaryData = [item, ...this.glossaryData];
+      // call the api
+      try {
+        const result= await ApiServices.addNewGlossary(item);
+        console.log(result)
+      } catch(e) {
+        console.log(e);
+      }
+      
     },
     addDocumentToGlossary(document, glossaryId) {
       if (!document || !glossaryId) {

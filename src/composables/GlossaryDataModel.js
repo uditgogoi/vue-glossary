@@ -1,9 +1,11 @@
 
 function createGlossaryItem(options = {}) {
+  console.log(options)
+
   return {
-    id: Date.now(),
+    id: `${Date.now()}`,
     title: options.title,
-    owner: "Udit",
+    owner: options.owner,
     createdAt: new Date(),
     status: "draft",
     collaborators: [],

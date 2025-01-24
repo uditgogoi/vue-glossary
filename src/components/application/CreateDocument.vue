@@ -58,16 +58,20 @@ import Button from "primevue/button";
 import Select from "primevue/select";
 import { computed, onMounted, ref, watch } from "vue";
 import { useGlossaryStore } from "@/store";
+import {useAuthStore} from "@/store/user";
 import CreateModalDialog from "@/components/modals/CreateModal.vue";
 import {
   createGlossaryItem,
   createDocument,
 } from "@/composables/GlossaryDataModel";
+import {authServices} from '@/service/authServices';
+
 const props = defineProps(["documentContent"]);
 const title = ref("");
 const editorContent = ref("");
 const selectedGlossary = ref({});
 const store = useGlossaryStore();
+const user= useAuthStore.loggedInUser;
 const showCreateGlossaryModal = ref(false);
 
 // onMounted(() => {
@@ -105,14 +109,16 @@ const onAddNewGlossary = () => {
   showCreateGlossaryModal.value = true;
 };
 
-const onCloseCreateModal = (name) => {
+const onCloseCreateModal = async(name) => {
   if (name) {
-    const newGlossaryItem = createGlossaryItem({ title: name });
-    store.addNewGlossaryItem(newGlossaryItem);
-    selectedGlossary.value = {
-      name: newGlossaryItem.title,
-      code: newGlossaryItem.id,
-    };
+    // const currentUser= user;
+    // const newGlossaryItem = createGlossaryItem({ title: name, owner: currentUser });
+    // console.log(newGlossaryItem)
+    // store.addNewGlossaryItem(newGlossaryItem);
+    // selectedGlossary.value = {
+    //   name: newGlossaryItem.title,
+    //   code: newGlossaryItem.id,
+    // };
   }
   showCreateGlossaryModal.value = false;
 

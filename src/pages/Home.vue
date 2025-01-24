@@ -72,11 +72,13 @@ import Divider from "primevue/divider";
 import Menu from "primevue/menu";
 import CreateModalDialog from "@/components/modals/CreateModal.vue";
 import { useGlossaryStore } from "@/store";
+import { useAuthStore } from "@/store/user";
 import GlossaryItem from "@/components/application/GlossaryItem.vue";
 import { createGlossaryItem } from "@/composables/GlossaryDataModel";
 
 const router = useRouter();
 const store = useGlossaryStore();
+const user= useAuthStore();
 const menu = ref();
 const showModal = ref(false);
 const createItems = ref([
@@ -117,9 +119,9 @@ const onSelectMenu = (type) => {
 const onCloseDialog = (name) => {
   showModal.value = false;
   if (name) {
-    // save the value with nam,e
-    const newGlossaryItem = createGlossaryItem({ title: name });
-    store.addNewGlossaryItem(newGlossaryItem);
+    const currentUser= user.loggedInUser.$id;
+    const newGlossary = createGlossaryItem({ title: name,owner:currentUser  });
+    store.addNewGlossary(newGlossary);
   }
 };
 </script>
