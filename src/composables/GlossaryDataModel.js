@@ -1,7 +1,5 @@
 
 function createGlossaryItem(options = {}) {
-  console.log(options)
-
   return {
     id: `${Date.now()}`,
     title: options.title,

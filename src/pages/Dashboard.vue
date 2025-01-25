@@ -4,28 +4,31 @@
     <app-sidebar></app-sidebar>
     <div class="layout-main-container">
       <div class="layout-main">
+        <Toast />
         <router-view v-if="loggedInUser"></router-view>
       </div>
       <app-footer></app-footer>
     </div>
     <!-- <div class="layout-mask animate-fadein"></div> -->
   </div>
-  <!-- <Toast /> -->
+  <Loader v-else />
 </template>
 <script setup>
 import { useGlossaryStore } from "@/store";
 import { useAuthStore } from "@/store/user";
-// import Button from "primevue/button";
-// import Dialog from "primevue/dialog";
 import AppTopbar from "@/components/AppTopbar.vue";
 import AppSidebar from "@/components/AppSidebar.vue";
 import { computed, nextTick, onMounted, ref } from "vue";
 import { useLayout } from "@/composables/layout";
+import Loader from "@/components/application/Loader.vue";
+import Toast from 'primevue/toast';
 
 const { layoutConfig, layoutState } = useLayout();
 
 const store = useGlossaryStore();
-const user= useAuthStore();
+const user = useAuthStore();
+
+
 const containerClass = computed(() => {
   return {
     "layout-overlay": layoutConfig.menuMode === "overlay",
@@ -37,15 +40,14 @@ const containerClass = computed(() => {
     "layout-mobile-active": layoutState.staticMenuMobileActive,
   };
 });
-const isReady=ref(false);
+const isReady = ref(false);
+
 onMounted(async () => {
   await store.fetchGlossaryItems();
   nextTick(() => {
-    console.log('inside nexttick glossary')
     isReady.value = true; // Only render child components after glossaryItems are fetched
   });
 });
 
-const loggedInUser= computed(()=> user.currentUser)
-
+const loggedInUser = computed(() => user.currentUser);
 </script>

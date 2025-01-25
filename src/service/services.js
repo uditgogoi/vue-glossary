@@ -38,7 +38,6 @@ const AppServices = {
   },
   getAllGlossary: async () => {
     const user = await authServices.getCurrentUser();
-    console.log(user.$id);
     try {
       const result = await databases.listDocuments(databaseId, collectionId, [
         Query.equal("owner", user.$id), // Filter by creator field

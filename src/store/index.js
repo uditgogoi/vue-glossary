@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { data } from "@/composables/data";
+import { useToastNotification } from "@/utils/useToastNotification";
 import ApiServices from "@/service/services";
 export const useGlossaryStore = defineStore("glossary", {
   state: () => ({
@@ -9,7 +9,7 @@ export const useGlossaryStore = defineStore("glossary", {
     selectedGlossaryItem: {
       glossaryId: "",
       selectedAlphabet: "",
-      selectedDocument:{}
+      selectedDocument:{},
     },
   }),
   getters: {
@@ -33,7 +33,6 @@ export const useGlossaryStore = defineStore("glossary", {
     async fetchGlossaryItems() {
       try {
         this.glossaryData= await ApiServices.getAllGlossary();
-        console.log(this.glossaryData)
       } catch(e){
         this.glossaryData= this.glossaryData || [];
       } finally {
@@ -41,16 +40,18 @@ export const useGlossaryStore = defineStore("glossary", {
       }
       // this.glossaryData = data ? data : null;
     },
+    addNewGlossaryToUi(item) {
+      this.glossaryData= [item, ...this.glossaryData];
+    },
     async addNewGlossary(item) {
       // this.glossaryData = [item, ...this.glossaryData];
       // call the api
       try {
         const result= await ApiServices.addNewGlossary(item);
-        console.log(result)
+        return result;
       } catch(e) {
-        console.log(e);
+        return new Error(e);
       }
-      
     },
     addDocumentToGlossary(document, glossaryId) {
       if (!document || !glossaryId) {
@@ -132,7 +133,7 @@ export const useGlossaryStore = defineStore("glossary", {
     },
     updatePageEditStatus(status) {
       this.pageEditMode=status;
-    }
+    },
   },
 });
 

@@ -7,7 +7,7 @@ import { useAuthStore } from "@/store/user";
 import Login from "@/pages/auth/Login.vue";
 import Dashboard from "@/pages/Dashboard.vue";
 import Glossary from "@/pages/Glossary.vue";
-import Document from "@/pages/NewDocument.vue";
+import Document from "@/pages/Document.vue";
 import Home from "@/pages/Home.vue";
 import { useGlossaryStore } from "@/store";
 

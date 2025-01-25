@@ -30,32 +30,32 @@
       <div
         class="col-span-2 lg:col-span-2 xl:col-span-2"
         v-for="item in draftItems"
-        :key="item.id"
+        :key="item.$id"
       >
         <GlossaryItem :item="item" />
       </div>
     </div>
 
-    <Divider align="left" type="dotted" :pt="{ content: 'divider-content' }">
+    <Divider align="left" type="dotted" :pt="{ content: 'divider-content' }" v-if="publishedGlossaryItems.length>0">
       <b>Published</b>
     </Divider>
     <div class="grid grid-cols-12 gap-8 mt-10 mb-10">
       <div
         class="col-span-2 lg:col-span-2 xl:col-span-2"
         v-for="item in publishedGlossaryItems"
-        :key="item.id"
+        :key="item.$id"
       >
         <GlossaryItem :item="item" />
       </div>
     </div>
-    <Divider align="left" type="dotted" :pt="{ content: 'divider-content' }">
+    <Divider align="left" type="dotted" :pt="{ content: 'divider-content' }" v-if="sharedGlossaryItems.length>0">
       <b>Shared with you</b>
     </Divider>
     <div class="grid grid-cols-12 gap-8 mt-10">
       <div
         class="col-span-2 lg:col-span-2 xl:col-span-2"
         v-for="item in sharedGlossaryItems"
-        :key="item.id"
+        :key="item.$id"
       >
         <GlossaryItem :item="item" />
       </div>
@@ -75,10 +75,13 @@ import { useGlossaryStore } from "@/store";
 import { useAuthStore } from "@/store/user";
 import GlossaryItem from "@/components/application/GlossaryItem.vue";
 import { createGlossaryItem } from "@/composables/GlossaryDataModel";
+import {useToastNotification} from "@/utils/useToastNotification";
 
 const router = useRouter();
 const store = useGlossaryStore();
 const user= useAuthStore();
+const { showToast } = useToastNotification();
+
 const menu = ref();
 const showModal = ref(false);
 const createItems = ref([
@@ -116,14 +119,35 @@ const onSelectMenu = (type) => {
   }
 };
 
-const onCloseDialog = (name) => {
+const onCloseDialog = async(name) => {
   showModal.value = false;
-  if (name) {
+  if(!name) {
+    return;
+  }
+  try{
     const currentUser= user.loggedInUser.$id;
     const newGlossary = createGlossaryItem({ title: name,owner:currentUser  });
-    store.addNewGlossary(newGlossary);
+    const result=await store.addNewGlossary(newGlossary);
+    if(result) {
+      store.addNewGlossaryToUi(result);
+      const success={type:'success',title:"Successfully created", message:"Glossary created successfully"}
+      showToastMessage(success);
+    }
+  } catch(e){
+    const error={type:'error',title:"Error found", message:e.message}
+    showToastMessage(error)
   }
+  
 };
+
+const showToastMessage=(obj) => {
+  showToast({
+    type: obj.type,
+    title: obj.title,
+    message: obj.message,
+    time: obj.time || 3000,
+  });
+}
 </script>
 <style scoped>
 .create-card {
