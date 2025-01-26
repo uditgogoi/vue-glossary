@@ -40,17 +40,26 @@ export const useGlossaryStore = defineStore("glossary", {
       }
       // this.glossaryData = data ? data : null;
     },
-    addNewGlossaryToUi(item) {
-      this.glossaryData= [item, ...this.glossaryData];
-    },
     async addNewGlossary(item) {
       // this.glossaryData = [item, ...this.glossaryData];
       // call the api
       try {
         const result= await ApiServices.addNewGlossary(item);
+        this.glossaryData= [item, ...this.glossaryData]
         return result;
       } catch(e) {
-        return new Error(e);
+        throw new Error(e);
+      }
+    },
+    async deleteGlossaryItem(id) {
+      try{
+        const result= await ApiServices.deleteGlossaryitem(id);
+        if(typeof result ==='object') {
+          this.glossaryData= this.glossaryData.filter(item=> item.id !== id)
+        }
+        return result;
+      } catch(e) {
+        throw new Error(e);
       }
     },
     addDocumentToGlossary(document, glossaryId) {

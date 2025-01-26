@@ -7,7 +7,7 @@ import { createPinia } from "pinia";
 import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
 import Tooltip from "primevue/tooltip";
-// import { user } from "@/store/user";
+
 
 import "./style.css";
 import { definePreset } from "@primevue/themes";
@@ -50,6 +50,7 @@ async function initialiseApp() {
     .use(router)
     .use(ConfirmationService)
     .use(ToastService)
+    .use(ConfirmationService)
     .directive("tooltip", Tooltip)
     .mount("#app");
 }

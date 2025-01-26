@@ -114,8 +114,6 @@
 <script setup>
 import { computed, ref } from "vue";
 import { Button } from "primevue";
-import { useLayout } from "@/composables/layout";
-const { onMenuToggle } = useLayout();
 import Popover from "primevue/popover";
 import Avatar from "primevue/avatar";
 import { useGlossaryStore } from "@/store/";
@@ -129,26 +127,6 @@ const showBackButton = computed(() =>
   store.getCurrentPage.toLowerCase() === "home" ? false : true
 );
 const op = ref();
-const members = ref([
-  {
-    name: "Amy Elsner",
-    image: "amyelsner.png",
-    email: "amy@email.com",
-    role: "Owner",
-  },
-  {
-    name: "Bernardo Dominic",
-    image: "bernardodominic.png",
-    email: "bernardo@email.com",
-    role: "Editor",
-  },
-  // {
-  //   name: "Ioni Bowcher",
-  //   image: "ionibowcher.png",
-  //   email: "ioni@email.com",
-  //   role: "Viewer",
-  // },
-]);
 
 const toggle = (event) => {
   op.value.toggle(event);
