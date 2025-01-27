@@ -1,33 +1,18 @@
 import { databases, Query } from "./db";
 import { ID } from "appwrite";
 import { authServices } from "./authServices";
+// import { useAuthStore } from "@/store/user";
 const databaseId = import.meta.env.VITE_DB_ID;
-const collectionId = import.meta.env.VITE_DB_GLOSSARY;
-// import api from "./Api";
-// export const fetchText=async(text)=> {
-//     const headers = {
-//         Authorization: `Bearer`,
-//         "Content-Type": "application/json",
-//         "x-wait-for-model": "true"
-//       };
+const glossaryCollectionId = import.meta.env.VITE_DB_GLOSSARY;
+const documentCollectionId = import.meta.env.VITE_DB_DOCUMENTS;
 
-//       const body = {
-//         inputs: 'hello india', // The input text to generate content from
-//       };
-//     try {
-//         const result= await api.post('/google/gemma-2-2b-it',body,{ headers })
-//         return result;
-//     } catch(e) {
-//         return new Error('Unexpected Result')
-//     }
-// }
-
+// const storeuser = useAuthStore();
 const AppServices = {
   addNewGlossary: async (glossary) => {
     try {
       const result = await databases.createDocument(
         databaseId,
-        collectionId,
+        glossaryCollectionId,
         String(ID.unique()),
         glossary
       );
@@ -38,19 +23,21 @@ const AppServices = {
   },
   deleteGlossaryitem: async (glossaryId) => {
     try {
-      const documentList = await databases.listDocuments(databaseId, collectionId, [
-        Query.equal("id", glossaryId),
-      ]);
+      const documentList = await databases.listDocuments(
+        databaseId,
+        glossaryCollectionId,
+        [Query.equal("id", glossaryId)]
+      );
       if (documentList.total > 0) {
         const documentId = documentList.documents[0].$id;
         const result = await databases.deleteDocument(
           databaseId,
-          collectionId,
+          glossaryCollectionId,
           documentId
         );
         return result;
       }
-      throw new Error('Document not found')
+      throw new Error("Document not found");
     } catch (e) {
       throw new Error(e.message);
     }
@@ -58,9 +45,41 @@ const AppServices = {
   getAllGlossary: async () => {
     const user = await authServices.getCurrentUser();
     try {
-      const result = await databases.listDocuments(databaseId, collectionId, [
-        Query.equal("owner", user.$id), // Filter by creator field
-      ]);
+      const result = await databases.listDocuments(
+        databaseId,
+        glossaryCollectionId,
+        [
+          Query.equal("owner", user.$id), // Filter by creator field
+        ]
+      );
+      return result.documents;
+    } catch (e) {
+      throw new Error(e);
+    }
+  },
+  saveDocuments: async (document) => {
+    try {
+      const result = await databases.createDocument(
+        databaseId,
+        documentCollectionId,
+        String(ID.unique()),
+        document
+      );
+      return result;
+    } catch (e) {
+      throw new Error(e);
+    }
+  },
+  fetchAllDocuments: async (currentUser,glossaryId) => {
+    try {
+      const result = await databases.listDocuments(
+        databaseId,
+        documentCollectionId,
+        [
+          Query.and([Query.equal("owner", currentUser),Query.equal("glossary", glossaryId)]),
+          Query.select(["title", "id","owner"])
+        ]
+      );
       return result.documents;
     } catch (e) {
       throw new Error(e);

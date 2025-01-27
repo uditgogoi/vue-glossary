@@ -20,6 +20,7 @@
           optionLabel="name"
           placeholder="Select a Glossary"
           class="w-full"
+          @change="onGlossaryValueChange"
         >
           <template #option="slotProps">
             <div class="flex items-center">
@@ -56,7 +57,7 @@ import InputText from "primevue/inputtext";
 import Editor from "@/components/application/Editor.vue";
 import Button from "primevue/button";
 import Select from "primevue/select";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch,reactive } from "vue";
 import { useGlossaryStore } from "@/store";
 import {useAuthStore} from "@/store/user";
 import CreateModalDialog from "@/components/modals/CreateModal.vue";
@@ -67,12 +68,18 @@ import {
 import {authServices} from '@/service/authServices';
 
 const props = defineProps(["documentContent"]);
+const emits= defineEmits(['change'])
 const title = ref("");
 const editorContent = ref("");
 const selectedGlossary = ref({});
 const store = useGlossaryStore();
 const user= useAuthStore.loggedInUser;
 const showCreateGlossaryModal = ref(false);
+const document= reactive({
+  title:null,
+  content:null,
+  glossary:null
+})
 
 // onMounted(() => {
 //   if (props.documentContent) {
@@ -85,7 +92,7 @@ const showCreateGlossaryModal = ref(false);
 watch(
   () => props.documentContent,
   () => {
-    if (props.documentContent && Object.keys(props.documentContent).length > 0) {
+    if (props.documentContent) {
       title.value = props.documentContent.title;
       selectedGlossary.value = props.documentContent.selectedGlossary;
       editorContent.value = props.documentContent.content;
@@ -97,6 +104,8 @@ watch(
 
 const onContentChange = (value) => {
   editorContent.value = value;
+  document.content=  editorContent.value;
+  emits('change',document)
 };
 
 const glossaries = computed(() =>
@@ -125,22 +134,14 @@ const onCloseCreateModal = async(name) => {
   // add the glossary to the list
 };
 
-const onSubmitDocument = () => {
-  if (!title || !editorContent) {
-    // show eeror message
-    return;
-  }
-  const newDoc = createDocument({
-    title: title.value,
-    content: editorContent.value,
-  });
-  store.addDocumentToGlossary(newDoc, selectedGlossary.value.code);
-};
+
 const onValueChange = async (e) => {
-  // try {
-  //   const generatedtext= fetchText(e);
-  //   console.log(generatedtext)
-  // } catch(e){
-  // }
+  document.title= title.value;
+  emits('change',document);
 };
+
+const onGlossaryValueChange=()=> {
+  document.glossary= selectedGlossary.value;
+  emits('change',document);
+}
 </script>

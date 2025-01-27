@@ -10,13 +10,10 @@
 </template>
 <script setup>
 import Editor from "primevue/editor";
-
-import { useToast } from "primevue/usetoast";
 import { onMounted, ref, watch } from "vue";
 
 const emits = defineEmits(["content-output"]);
 const props = defineProps(["document"]);
-const toast = useToast();
 const editorContent = ref("");
 
 const onEditorValueChange = (e) => {

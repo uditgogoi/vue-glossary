@@ -17,7 +17,7 @@ import ProgressSpinner from 'primevue/progressspinner';
      display: flex;
      align-items: center;
      justify-content: center;
-     background: rgba(1,1,0,0.5);
+     background: rgba(1,1,0,0.3);
      z-index: 999;
 }
 </style>

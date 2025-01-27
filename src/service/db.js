@@ -1,4 +1,4 @@
-import { Client,Account,ID as appwriteId,Databases,Query as dbQuery } from 'appwrite';
+import { Client,Account,Databases,Query as dbQuery } from 'appwrite';
 const client = new Client();
 client
 .setEndpoint(import.meta.env.VITE_APPWRITE_ENDPOINT)
@@ -6,5 +6,4 @@ client
 
 export const account = new Account(client);
 export const databases = new Databases(client);
-export const ID= appwriteId.unique();
 export const Query=dbQuery;

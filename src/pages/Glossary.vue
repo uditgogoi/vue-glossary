@@ -18,7 +18,7 @@
         </div>
       </div>
       <div class="grid grid-cols-12 gap-4" v-else>
-        <div v-if="document.content && !editMode" class="content col-span-9 p-8 rounded bg-white">
+        <!-- <div v-if="document.content && !editMode" class="content col-span-9 p-8 rounded bg-white">
           <h4 class="text-3xl font-normal text-black">{{ document.title }}</h4>
           <div
             class="mt-8"
@@ -28,7 +28,7 @@
 
         <div class="col-span-9 p-10 rounded bg-white" v-else>
           <CreateDocument :documentContent="editDocumentContent" />
-        </div>
+        </div> -->
 
         <div class="col-span-3 bg-white p-10 rounded">
           <div class="mt-4">
@@ -74,12 +74,14 @@ import Button from "primevue/button";
 import { computed, onMounted, ref, reactive, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useGlossaryStore } from "@/store";
+import {useAuthStore} from "@/store/user";
 import Loader from "@/components/application/Loader.vue";
 import CreateDocument from "@/components/application/CreateDocument.vue";
 
 const router = useRouter();
 const route = useRoute();
 const store = useGlossaryStore();
+const user= useAuthStore();
 const documentCollections = ref([]);
 const isLoading = ref(true);
 const editDocumentContent = ref({});
@@ -98,11 +100,16 @@ onMounted(() => {
   fetchAllDocuments();
 });
 
-const fetchAllDocuments = () => {
+const fetchAllDocuments = async() => {
   const glossaryId = route.params.id;
-  documentCollections.value = store.fetchAllDocuments(glossaryId);
+  const userId= user.currentUser?.$id;
+  try{
+    documentCollections.value = await store.fetchAllDocuments(userId,glossaryId);
+  } catch(e){
+
+  }
+  
   isLoading.value = false;
-  // store.fetchAllDocuments()
 };
 
 const onClickCreate = () => {

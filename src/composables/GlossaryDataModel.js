@@ -1,7 +1,7 @@
-
+import {ID} from 'appwrite';
 function createGlossaryItem(options = {}) {
   return {
-    id: `${Date.now()}`,
+    id: `${ID.unique()}`,
     title: options.title,
     owner: options.owner,
     createdAt: new Date(),
@@ -14,16 +14,17 @@ function createGlossaryItem(options = {}) {
 function createDocument(options = {}) {
   const initialCreateTime= new Date();
   return {
-    id: Date.now(),
+    id: `${ID.unique()}`,
     title: options.title,
     content:options.content,
-    owner: "Udit",
+    owner: options.owner,
     createdAt: initialCreateTime,
     updatedAt: initialCreateTime,
     status: "draft",
     collaborators: [],
     version:'0.1',
-    attachments:[]
+    attachments:[],
+    glossary:options.glossaryId
   };
 }
 

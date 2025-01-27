@@ -87,18 +87,18 @@ import { useGlossaryStore } from "@/store";
 import { useAuthStore } from "@/store/user";
 import GlossaryItem from "@/components/application/GlossaryItem.vue";
 import { createGlossaryItem } from "@/composables/GlossaryDataModel";
-import { useToastNotification } from "@/utils/useToastNotification";
+import { showToastMessage } from "@/utils/useToastNotification";
 import { useConfirm } from "primevue/useconfirm";
 import Loader from "@/components/application/Loader.vue";
+import {useToast} from "primevue/usetoast";
 
 const confirm = useConfirm();
 const router = useRouter();
 const store = useGlossaryStore();
 const user = useAuthStore();
-const { showToast } = useToastNotification();
-
 const menu = ref();
 const showModal = ref(false);
+const toast= useToast();
 const createItems = ref([
   {
     id: "glossary",
@@ -150,11 +150,11 @@ const onCloseDialog = async (name) => {
         title: "Successfully created",
         message: "Glossary created successfully",
       };
-      showToastMessage(success);
+      showToastMessage(toast,success);
     }
   } catch (e) {
     const error = { type: "error", title: "Error found", message: e.message };
-    showToastMessage(error);
+    showToastMessage(toast,error);
   } finally {
     loading.value=false;
   }
@@ -184,14 +184,14 @@ const onGlossaryDelete = (id) => {
           title: "Successfully deleted",
           message: "Glossary deleted successfully",
         };
-        showToastMessage(success);
+        showToastMessage(toast,success);
       } catch (e) {
         const error = {
           type: "error",
           title: "Error found",
           message: `${e.message}`,
         };
-        showToastMessage(error);
+        showToastMessage(toast,error);
       } finally{
         loading.value=false;
       }
@@ -199,14 +199,6 @@ const onGlossaryDelete = (id) => {
   });
 };
 
-const showToastMessage = (obj) => {
-  showToast({
-    type: obj.type,
-    title: obj.title,
-    message: obj.message,
-    time: obj.time || 3000,
-  });
-};
 </script>
 <style scoped>
 .create-card {

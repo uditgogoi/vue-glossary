@@ -57,22 +57,23 @@ import { useGlossaryStore } from "@/store";
 import Button from "primevue/button";
 import Divider from "primevue/divider";
 import InputText from "primevue/inputtext";
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 import {trimCharacter,showTooltipValue} from "@/utils/helper";
 
 
 const store = useGlossaryStore();
-const alphabets = ref("");
-const documentList = ref([]);
 const documentSearchText = ref("");
 const documentSearch = ref(false);
 const { selectedGlossaryItem } = storeToRefs(store);
 const route = useRoute();
+const documentList= computed(()=> store.getDocumentList)
+const alphabets= ref([]);
+
 onMounted(() => {
-  getAlphabets();
-  setDefaultSelectedGlossary();
+  // getAlphabets();
+  // setDefaultSelectedGlossary();
 });
 
 watch(selectedGlossaryItem, () => {
@@ -80,8 +81,13 @@ watch(selectedGlossaryItem, () => {
   // getDocumentContent();
 });
 
+watch(documentList,()=> {
+  getAlphabets();
+  setDefaultSelectedGlossary();
+})
+
 function getAlphabets() {
-  alphabets.value = store.getExistingAlphabets(route.params.id);
+  alphabets.value = store.getExistingAlphabets();
 }
 
 function setDefaultSelectedGlossary() {

@@ -1,5 +1,6 @@
 
-import {account,ID} from './db';
+import {account} from './db';
+import {ID} from 'appwrite';
 export const authServices= {
     getCurrentUser: async()=> await account.get(),
     register:async(email,password,name)=> await account.create(ID.unique(),email,password,name),
