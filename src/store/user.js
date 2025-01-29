@@ -10,7 +10,6 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async getLoggedInUser() {
       try {
-        console.log("running init")
         this.currentUser = await authServices.getCurrentUser();
         
       } catch (e) {

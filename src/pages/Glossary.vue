@@ -18,18 +18,20 @@
         </div>
       </div>
       <div class="grid grid-cols-12 gap-4" v-else>
-        <!-- <div v-if="document.content && !editMode" class="content col-span-9 p-8 rounded bg-white">
-          <h4 class="text-3xl font-normal text-black">{{ document.title }}</h4>
-          <div
-            class="mt-8"
-            v-html="document.content"
-          ></div>
+        <div v-if="!document" class="content col-span-9 p-8 rounded bg-white">
+          <DocumentSkeleton />
         </div>
-
-        <div class="col-span-9 p-10 rounded bg-white" v-else>
-          <CreateDocument :documentContent="editDocumentContent" />
-        </div> -->
-
+        <div v-else class="content col-span-9 p-8 rounded bg-white">
+          <div v-if="editMode === false">
+            <h4 class="text-3xl font-normal text-black" v-if="document.title">
+              {{ document.title }}
+            </h4>
+            <div class="mt-8 document" v-html="document.content"></div>
+          </div>
+          <div class="col-span-9 p-10 rounded bg-white" v-else>
+            <CreateDocument :documentContent="editDocumentContent" />
+          </div>
+        </div>
         <div class="col-span-3 bg-white p-10 rounded">
           <div class="mt-4">
             <Button
@@ -61,7 +63,12 @@
             />
           </div>
           <div class="mt-4">
-            <Button label="Save Changes" severity="primary" size="small" @click="onSaveChanges"/>
+            <Button
+              label="Save Changes"
+              severity="primary"
+              size="small"
+              @click="onSaveChanges"
+            />
           </div>
         </div>
       </div>
@@ -74,42 +81,56 @@ import Button from "primevue/button";
 import { computed, onMounted, ref, reactive, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useGlossaryStore } from "@/store";
-import {useAuthStore} from "@/store/user";
+import { useAuthStore } from "@/store/user";
 import Loader from "@/components/application/Loader.vue";
 import CreateDocument from "@/components/application/CreateDocument.vue";
+import DocumentSkeleton from "@/components/application/DocumentSkeleton.vue";
 
 const router = useRouter();
 const route = useRoute();
 const store = useGlossaryStore();
-const user= useAuthStore();
+const user = useAuthStore();
 const documentCollections = ref([]);
 const isLoading = ref(true);
 const editDocumentContent = ref({});
+const documentLoading = ref(false);
 
 const editMode = computed(() => store.getPageEditMode);
-const document = computed(() => store.getActiveDocument);
+const document = computed(() => store.getSelectedDocumentContent || null);
+const alphabets = computed(() => store.getAlphabets);
 
+const glossaryId = route.params.id;
+const userId = user?.currentUser?.$id;
 
-store.setCurrentPage('glossary');
+store.setCurrentPage("glossary");
 
 const onCreateDocumemt = () => {
   router.push({ name: "createDocument" });
 };
 
-onMounted(() => {
-  fetchAllDocuments();
+onMounted(async () => {
+  await fetchAllDocuments();
+  await setSelectedDocument();
 });
 
-const fetchAllDocuments = async() => {
-  const glossaryId = route.params.id;
-  const userId= user.currentUser?.$id;
-  try{
-    documentCollections.value = await store.fetchAllDocuments(userId,glossaryId);
-  } catch(e){
+const fetchAllDocuments = async () => {
+  try {
+    documentCollections.value = await store.fetchAllDocuments(
+      userId,
+      glossaryId
+    );
+  } catch (e) {}
 
-  }
-  
   isLoading.value = false;
+};
+
+const setSelectedDocument = async () => {
+  const params = {
+    glossaryId: glossaryId,
+    selectedAlphabet: alphabets.value.length > 0 ? alphabets.value[0] : "",
+    selectedDocument: null,
+  };
+  await store.updateSelectedGlossaryItem(params);
 };
 
 const onClickCreate = () => {
@@ -148,9 +169,10 @@ const getDocumentById = () => {
   return currentDocument.title;
 };
 
-const onSaveChanges=()=> {
-  
-}
+const onSaveChanges = () => {};
 </script>
 <style scoped>
+.document {
+  line-height: 2rem;
+}
 </style>

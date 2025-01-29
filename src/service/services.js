@@ -70,17 +70,32 @@ const AppServices = {
       throw new Error(e);
     }
   },
-  fetchAllDocuments: async (currentUser,glossaryId) => {
+  fetchAllDocuments: async (currentUser, glossaryId) => {
     try {
       const result = await databases.listDocuments(
         databaseId,
         documentCollectionId,
         [
-          Query.and([Query.equal("owner", currentUser),Query.equal("glossary", glossaryId)]),
-          Query.select(["title", "id","owner"])
+          Query.and([
+            Query.equal("owner", currentUser),
+            Query.equal("glossary", glossaryId),
+          ]),
+          Query.select(["title","$id", "id", "owner"]),
         ]
       );
       return result.documents;
+    } catch (e) {
+      throw new Error(e);
+    }
+  },
+  fetchOneDocument: async (documentId) => {
+    try {
+      const result = await databases.getDocument(
+        databaseId,
+        documentCollectionId,
+        documentId,
+      );
+      return result;
     } catch (e) {
       throw new Error(e);
     }

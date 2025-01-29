@@ -46,7 +46,7 @@
           variant="link"
           size="small"
           v-tooltip="getTooltipValue(document.title)"
-          @click="getDocumentContent(document.id)"
+          @click="getDocumentContent(document.$id)"
         />
       </div>
     </div>
@@ -66,64 +66,24 @@ import {trimCharacter,showTooltipValue} from "@/utils/helper";
 const store = useGlossaryStore();
 const documentSearchText = ref("");
 const documentSearch = ref(false);
-const { selectedGlossaryItem } = storeToRefs(store);
 const route = useRoute();
-const documentList= computed(()=> store.getDocumentList)
-const alphabets= ref([]);
+const selectedGlossaryContent=  computed(()=> store.getSelectedGlossaryItem)
+const documentList= computed(()=> store.getDocumentList.filter(item=> item.title[0].toLowerCase()=== selectedGlossaryContent.value.selectedAlphabet.toLowerCase()))
+const alphabets= computed(()=> store.getAlphabets)
 
-onMounted(() => {
-  // getAlphabets();
-  // setDefaultSelectedGlossary();
-});
 
-watch(selectedGlossaryItem, () => {
-  getSelectedPages();
-  // getDocumentContent();
-});
-
-watch(documentList,()=> {
-  getAlphabets();
-  setDefaultSelectedGlossary();
-})
-
-function getAlphabets() {
-  alphabets.value = store.getExistingAlphabets();
-}
-
-function setDefaultSelectedGlossary() {
-  const document = store.defaultGlossaryPageContent(
-    route.params.id,
-    alphabets.value[0]
-  );
-  const params = {
-    glossaryId: route.params.id,
-    selectedAlphabet: alphabets.value.length > 0 ? alphabets.value[0] : "",
-    selectedDocument: document,
-  };
-  store.updateSelectedGlossaryItem(params);
-}
-
-function getSelectedPages() {
-  const pages = store.getSelectedPagesByAlphabet(route.params.id);
-  documentList.value = pages.length > 0 ? pages : [];
-}
-
-const onChangeAlphabet = (letter) => {
-  const document = store.defaultGlossaryPageContent(
-    route.params.id,
-    letter.toUpperCase()
-  );
+const onChangeAlphabet = async(letter) => {
   const params = {
     glossaryId: route.params.id,
     selectedAlphabet: letter.toUpperCase(),
-    selectedDocument: document,
+    selectedDocument: null,
   };
-  store.updateSelectedGlossaryItem(params);
+  await store.updateSelectedGlossaryItem(params);
   updatePageEditMode();
 };
 
-const getDocumentContent = (pageid) => {
-  store.currentGlossaryPageContent(route.params.id, pageid);
+const getDocumentContent = async(pageid) => {
+  await store.currentGlossaryPageContent(route.params.id, pageid);
   updatePageEditMode();
 };
 

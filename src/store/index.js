@@ -1,11 +1,13 @@
 import { defineStore } from "pinia";
 import ApiServices from "@/service/services";
+import {sortArrayByAlphabet} from "@/utils/helper"
 export const useGlossaryStore = defineStore("glossary", {
   state: () => ({
     glossaryData: [],
     documentList: [],
     currentPage: "",
     pageEditMode: false,
+    alphabets:[],
     selectedGlossaryItem: {
       glossaryId: "",
       selectedAlphabet: "",
@@ -22,11 +24,11 @@ export const useGlossaryStore = defineStore("glossary", {
       state.glossaryData.filter((item) => item.status === "draft"),
     sharedGlossaryItems: (state) =>
       state.glossaryData.filter((item) => item.status === "shared"),
-    // getSelectedDocumentList:(state)=>,
+    getSelectedGlossaryItem:(state)=>state.selectedGlossaryItem,
     getSelectedDocumentContent: (state) =>
-      state.selectedGlossaryItem.selectedDocument.content,
-    getActiveDocument: (state) => state.selectedGlossaryItem.selectedDocument,
+      state.selectedGlossaryItem.selectedDocument,
     getPageEditMode: (state) => state.pageEditMode,
+    getAlphabets:(state)=> state.alphabets,
   },
   actions: {
     setCurrentPage(page) {
@@ -81,14 +83,24 @@ export const useGlossaryStore = defineStore("glossary", {
     async fetchAllDocuments(userId, glossaryId) {
       try {
         const result = await ApiServices.fetchAllDocuments(userId, glossaryId);
-        this.documentList = result;
+        this.documentList = sortArrayByAlphabet(result);
+        this.constructExistingAlphabets();
         return result;
       } catch (e) {
         throw new Error(e);
       }
     },
 
-    getExistingAlphabets() {
+    async getSelectedDocument(documentId) {
+      try{
+        const newDocumentId= documentId || this.documentList[0]?.$id;
+        const result= await ApiServices.fetchOneDocument(newDocumentId);
+        return result;
+      } catch(e) {
+        throw new Error(e);
+      }
+    },
+    constructExistingAlphabets() {
       if (this.getDocumentList.length === 0) {
         return [];
       }
@@ -100,55 +112,20 @@ export const useGlossaryStore = defineStore("glossary", {
         }
       }
       
-      return alphabets;
+      this.alphabets= alphabets.sort();
     },
 
-    updateSelectedGlossaryItem(currentSelection) {
+    async updateSelectedGlossaryItem(currentSelection) {
       this.selectedGlossaryItem = JSON.parse(JSON.stringify(currentSelection));
+      const currentDoc= this.getDocumentList.find(item=> item.title[0].toLowerCase()=== this.selectedGlossaryItem.selectedAlphabet.toLowerCase())
+      const document= await this.getSelectedDocument(currentDoc.$id);
+      this.selectedGlossaryItem.selectedDocument=document;
     },
-    getSelectedPagesByAlphabet(glossaryId) {
-      const existingGlossaryDocuments =
-        this.glossaryData.find((glossary) => glossary.id === glossaryId)
-          ?.pages || [];
-      // based on the selected alphabet of 'selectedGlossaryItem', select the page list
-      let pageList = [];
-      for (let i = 0; i < existingGlossaryDocuments.length; i++) {
-        if (
-          existingGlossaryDocuments[i].title[0]?.toUpperCase() ===
-          this.selectedGlossaryItem.selectedAlphabet?.toUpperCase()
-        ) {
-          pageList.push(existingGlossaryDocuments[i]);
-        }
-      }
-      return pageList;
-    },
-    defaultGlossaryPageContent(glossaryId, alphabet) {
-      const pages =
-        this.glossaryData.find((glossary) => glossary.id === glossaryId)
-          ?.pages || [];
 
-      if (pages.length === 0) {
-        return {};
-      }
-      const selectedPage = pages.find(
-        (page) => page.title[0].toUpperCase() === alphabet.toUpperCase()
-      );
-
-      return selectedPage;
-    },
-    currentGlossaryPageContent(glossaryId, pageId) {
-      const pages =
-        this.glossaryData.find((glossary) => glossary.id === glossaryId)
-          ?.pages || [];
-      let pageContent = "";
-      if (pages.length > 0) {
-        pageContent = pages.find((page) => page.id === pageId);
-      }
+    async currentGlossaryPageContent(glossaryId, pageId) {
       this.selectedGlossaryItem.glossaryId = glossaryId;
-      this.selectedGlossaryItem.selectedDocument = JSON.parse(
-        JSON.stringify(pageContent)
-      );
-      // console.log(this.selectedGlossaryItem.selectedDocument)
+      const document= await this.getSelectedDocument(pageId);
+      this.selectedGlossaryItem.selectedDocument = document
     },
     updatePageEditStatus(status) {
       this.pageEditMode = status;

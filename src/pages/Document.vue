@@ -41,7 +41,6 @@ const onValueChange = (value) => {
   const documentValue = value;
   documentValue.glossaryId = documentValue.glossary?.code;
   document.value = createDocument(documentValue);
-  console.log(document);
 };
 
 const onSaveChanges = async () => {
